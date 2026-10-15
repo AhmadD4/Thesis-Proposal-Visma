@@ -9,38 +9,61 @@ See the [writing guide](master-thesis-proposal-guide.md) for what makes a good p
 - **Program:** [Computer Science]
 - **Project period:** [Spring 2027]
 - **Supervisor(s):** [TBD]
-- **External partner:** [Visma/Rune Pedersen]
+- **External partner:** [Sticos AS (Visma Subsidiary)/ Rune Pedersen]
 
 ## Research Question
 
-> How can AI be used to analyse accounting transactions and help identify errors, risks, unusual transactions, or other issues that may require further attention?
+> How effectively can non-autoregressive decision models evaluate financial transactions for anomaly detection, categorization, and audit risk compared to cloud LLMs and classical rule engines?
 
 ## Background and Motivation
-Visma has accounting data from many companies. This includes transactions related to purchases, salaries, expenses, sales, and other financial activities. They also have access to audit-related data for these companies.
+Visma processes large volumes of sensitive financial and accounting data across multiple jurisdictions, including purchase invoices, salary records, expense claims, and sales logs.
 
-The idea of the project is to investigate how AI can be used to analyse this data and help identify possible problems. Examples could be errors in accounting, unusual transactions, risks, or transactions that an auditor should look at more closely.
+Automated audit mechanisms have traditionally relied either on rigid rule engines or, more recently, Large Language Models (LLMs). While LLMs excel at general reasoning, they suffer from high inference latency, substantial token costs, potential hallucinations, and strict data privacy constraints when transmitting raw transaction data to third-party cloud APIs.
 
-Visma has suggested looking at different types of AI models. A smaller AI model could first analyse the data and identify transactions that may need further analysis. More complex cases could then be analysed by a larger language model (LLM).
+Decision models (such as open-weight models like Laya or managed services like Jev) present a targeted alternative to generative LLMs. Instead of generating natural language text token-by-token, these non-autoregressive models perform a single forward pass over input context to produce structured choices, ordinal scores, or boolean probabilities with built-in epistemic confidence.
 
+Evaluating open-weight decision models—perhaps hosted directly within Visma's private infrastructure or on-premise environments—presents a high-value research opportunity.
 
-We plan to build a prototype AI system that can analyse accounting data provided by Visma through APIs.
+This architecture offers:
 
-The system could include an AI agent that has access to different AI models and tools. The agent would analyse transactions and highlight cases that may require further investigation.
+Strict Data Governance: Full compliance with financial privacy and GDPR regulations by keeping transaction evaluation entirely inside local parameters (if run locally).
 
-The exact technical solution has not been decided yet. We plan to define this together with Visma and the academic supervisor as the project develops.
+Ultra-Low Latency Triage: Millisecond-level single-pass evaluation capable of processing high-volume transaction feeds.
+
+Calibrated Decision Gates: Leveraging calibrated probability distributions (e.g., via Reinforcement Learning for Calibrated Decisions) to form a "System 1" fast filter. High-confidence routine cases pass automatically, while ambiguous cases are escalated to human auditors or specialized "System 2" LLM reasoning components.
 
 ## Evaluation
+The prototype will be evaluated using anonymized financial transaction and audit datasets provided by Visma across four primary dimensions:
 
-We will test the prototype using accounting data provided by Visma and evaluate how well it can identify relevant errors, risks, or unusual transactions.
+Predictive Accuracy & Quality: Precision, Recall, F1-score, and ROC-AUC on identifying accounting errors, suspicious patterns, or tax misclassifications.
 
-The exact evaluation method will depend on the available data and will be defined together with Visma and the academic supervisor.
+Calibration Quality: Expected Calibration Error (ECE) and Brier scores to measure how reliably the model's output probabilities align with true risk frequencies.
 
+Computational Footprint: Single-pass latency (p50/p99 in milliseconds), throughput (transactions/sec), and memory footprint when running on local hardware/GPU instances.
+
+Generalization: Performance comparison between zero-shot base models and domain-specialized checkpoints across different accounting domains.
+
+The decision models will be benchmarked against traditional rule-based classifiers and small generative LLMs using structured output.
 ## Scope
 
-- Core work: Build and test a prototype AI system for analysing accounting transactions.
-- Possible extensions: Use multiple AI models, AI agents, tools/MCP, audit data, and investigate specific areas such as accounting errors, risks or suspicious transactions.
-The scope will be narrowed down together with Visma and the academic supervisor before the main implementation starts.
+- **Core work:** The project will design, specialize, and benchmark a decision model framework for automated accounting transaction triage and risk scoring.
 
+  The proposed architecture will investigate:
+
+  1. **Model Fine-Tuning & Specialization**  
+     Adapting base open-weight decision architectures (e.g., Laya / ModernBERT-based decision heads) on Visma's accounting transaction schemas and historical audit label sets.
+
+  2. **Confidence Calibration & Escalation Thresholds**  
+     Fitting temperature parameters and probability boundaries on transaction risk questions (e.g., yes/no suspicious flags, ordinal urgency scores, or tax categorization choices) to ensure decision probabilities accurately reflect real-world error rates.
+
+  3. **Comparative Evaluation**  
+     Benchmarking local decision models against traditional rule-based classifiers and small generative LLMs using structured output.
+
+- **Optional work:** Further investigation of a System 1 / System 2 architecture where high-confidence cases are handled directly by decision models while uncertain cases are escalated to human auditors or larger LLM-based reasoning components.
+
+- **Alternatives:** If fine-tuning or local deployment of a selected decision model is not feasible, the project can evaluate available managed decision models and compare them with locally deployable classification models, rule-based systems, and generative LLM baselines.
 ## References
 
-Relevant research papers and technologies will be selected after the final scope and technical approach have been defined.
+Jev – System One / decision model example: https://levelup.gitconnected.com/jev-clearly-explained-3203d6d48de3
+
+Additional academic literature and model documentation will be added as the technical approach is refined.
